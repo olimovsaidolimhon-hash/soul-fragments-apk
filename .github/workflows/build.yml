@@ -1,34 +1,35 @@
 name: Build APK
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '16'
 
       - name: Install Cordova
         run: npm install -g cordova
 
-      - name: Create Cordova project
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Android release
         run: |
-          cordova create app com.example.soulfragments "Soul Fragments"
-          cp -r www app/www
-          cp config.xml app/
-          cd app
           cordova platform add android
           cordova build android --release
 
       - name: Upload APK
-  uses: actions/upload-artifact@v4
-  with:
-    name: SoulFragments-APK
-    path: app/platforms/android/app/build/outputs/apk/release/app-release.apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: SoulFragments-APK
+          path: app/platforms/android/app/build/outputs/apk/release/app-release.apk
